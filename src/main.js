@@ -105,7 +105,7 @@ refs.loadMore.addEventListener('click', async () => {
         });
 
         const totalHits = data.totalHits;
-        const totalPages = Math.floor(totalHits / PER_PAGE);
+        const totalPages = Math.ceil(totalHits / PER_PAGE);
 
         if (page === totalPages) {
             iziToast.info({
