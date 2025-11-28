@@ -48,20 +48,25 @@ refs.form.addEventListener('submit', async e => {
     try {
         const data = await getImagesByQuery(searchText, page);
 
-        if (data.hits.length === 0) {
+        const images = data.hits;
+
+        if (images.length === 0) {
             iziToast.error({
                 message:
                     'Sorry, there are no images matching your search query. Please try again!',
                 position: 'topRight',
             });
         } else {
+            createGallery(images);
             showLoadMoreButton();
         }
-
-        const images = data.hits;
-        createGallery(images);
     } catch (error) {
         console.error(error);
+
+        iziToast.error({
+            message: `Sorry! We can't find that page. It may have been deleted or moved.`,
+            position: 'topRight',
+        });
     }
 
     hideLoader();
@@ -79,7 +84,17 @@ refs.loadMore.addEventListener('click', async () => {
         const data = await getImagesByQuery(userQuery, page);
 
         const images = data.hits;
-        createGallery(images);
+
+        if (images.length === 0) {
+            iziToast.error({
+                message:
+                    'Sorry, there are no images matching your search query. Please try again!',
+                position: 'topRight',
+            });
+        } else {
+            createGallery(images);
+            showLoadMoreButton();
+        }
 
         const cardSize =
             refs.galleryList.firstElementChild.getBoundingClientRect();
@@ -90,23 +105,23 @@ refs.loadMore.addEventListener('click', async () => {
         });
 
         const totalHits = data.totalHits;
-        const totalPages = Math.ceil(totalHits / PER_PAGE);
+        const totalPages = Math.floor(totalHits / PER_PAGE);
 
         if (page === totalPages) {
             iziToast.info({
                 message: `We're sorry, but you've reached the end of search results.`,
                 position: 'topRight',
             });
-
             hideLoadMoreButton();
         }
-
-        showLoadMoreButton();
     } catch (error) {
         console.error(error);
+
+        iziToast.error({
+            message: `Sorry! We can't find that page. It may have been deleted or moved.`,
+            position: 'topRight',
+        });
     }
 
-    if (refs.loadMore.className !== 'hidden') {
-        hideLoader();
-    }
+    hideLoader();
 });
